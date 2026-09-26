@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050807">
+<title>WA BUG CYBER V5 — Visual Simulation</title>
+<style>
+:root{--bg:#050807;--panel:#0a100e;--green:#39ff88;--red:#ff3155;--muted:#83a397;--line:#183528}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#10251a 0%,#050807 55%);color:#e4fff0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(57,255,136,.035) 4px);mix-blend-mode:screen}
+#matrix{position:fixed;inset:0;width:100%;height:100%;opacity:.12;pointer-events:none}
+.wrap{width:min(100% - 24px,980px);margin:0 auto;padding:22px 0 35px;position:relative}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:15px}
+.status{color:var(--green)}.dot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:6px;box-shadow:0 0 10px var(--green)}
+header,.panel{background:linear-gradient(145deg,rgba(10,20,15,.96),rgba(5,10,8,.96));border:1px solid var(--line);box-shadow:0 0 24px #0008,inset 0 0 20px #39ff8808;border-radius:12px}
+header{text-align:center;padding:27px 16px 22px;position:relative;overflow:hidden}
+header:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),var(--red),transparent)}
+.eyebrow{color:var(--red);font-size:11px;letter-spacing:3px}
+h1{font-size:clamp(27px,7vw,48px);line-height:1.1;margin:12px 0;color:var(--green);text-shadow:0 0 12px #39ff8866;letter-spacing:1px}
+.glitch{animation:glitch 4s infinite}
+@keyframes glitch{0%,94%,100%{transform:translate(0);text-shadow:0 0 12px #39ff8866}95%{transform:translate(2px,-1px);text-shadow:-3px 0 var(--red),3px 0 #00eaff}97%{transform:translate(-2px,1px);text-shadow:3px 0 var(--red),-3px 0 #00eaff}}
+.subtitle{font-size:12px;color:var(--muted);line-height:1.7}
+.badge{display:inline-block;border:1px solid #7c2636;color:#ff7188;background:#ff31550c;border-radius:4px;padding:7px 10px;font-size:10px;letter-spacing:1px;margin-top:15px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:14px}
+.panel{padding:16px;min-width:0}
+.panel-title{font-size:11px;letter-spacing:1.5px;color:var(--green);margin:0 0 14px;display:flex;justify-content:space-between;gap:8px}
+.panel-title span{color:var(--muted);font-size:10px;font-weight:normal}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+button{font:700 12px ui-monospace,monospace;letter-spacing:1px;padding:12px 8px;border-radius:6px;border:1px solid var(--green);background:#0a1b11;color:var(--green);cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s}
+button:active{transform:scale(.96);box-shadow:0 0 18px #39ff8855}
+button.red{border-color:var(--red);color:#ff7188;background:#210a10}
+button.gray{border-color:#3d5c4d;color:#b5cfc2;background:#101914}
+button:focus-visible{outline:2px solid white;outline-offset:3px}
+.progress-head{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin:17px 0 8px}
+.track{height:9px;border:1px solid #244b36;background:#030604;border-radius:10px;overflow:hidden}
+#bar{height:100%;width:0%;background:linear-gradient(90deg,var(--green),#d5ff69);box-shadow:0 0 12px var(--green);transition:width .2s}
+#percent{color:var(--green)}
+.terminal{height:230px;overflow:auto;background:#030604;border:1px solid #183528;border-radius:7px;padding:12px;font-size:11px;line-height:1.75;scrollbar-color:#24583b #050807;overflow-wrap:anywhere}
+.log{color:#9bb9a9}.log .time{color:#4d7d64}.log .ok{color:var(--green)}.log .warn{color:#ffc857}.log .err{color:var(--red)}
+.msg{display:flex;gap:9px;align-items:flex-start;border-bottom:1px solid #14251c;padding:10px 0}
+.avatar{width:31px;height:31px;flex:0 0 31px;border-radius:50%;display:grid;place-items:center;background:#10281a;border:1px solid #2b6542;color:var(--green);font-weight:bold}
+.msgbody{min-width:0;flex:1}.msghead{display:flex;justify-content:space-between;gap:7px;font-size:11px}.msghead strong{color:#d9ffe8}.msghead small{color:#6f8f7d}.bubble{margin-top:5px;font-size:12px;line-height:1.5;color:#a9c2b4;overflow-wrap:anywhere}
+.mini-label{font-size:10px;color:var(--muted);margin-bottom:9px}
+.switchrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:13px;color:var(--muted);font-size:11px}
+.switchrow button{padding:8px 10px;font-size:10px}
+.footer{text-align:center;color:#547364;font-size:10px;line-height:1.7;margin-top:17px}
+.error-overlay{position:fixed;inset:0;z-index:10;background:#050807ee;display:none;align-items:center;justify-content:center;padding:20px}
+.error-card{width:min(100%,420px);border:1px solid var(--red);background:#10070a;padding:24px;border-radius:10px;box-shadow:0 0 40px #ff315533;text-align:center}
+.error-card h2{color:var(--red);font-size:22px}.error-card p{color:#d3a5ae;font-size:12px;line-height:1.7}
+.error-card button{margin-top:10px}
+body.distort{animation:distort .25s steps(2) 3}
+@keyframes distort{0%{filter:none}50%{filter:hue-rotate(100deg) contrast(1.5)}100%{filter:none}}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.wrap{width:min(100% - 18px,980px);padding-top:13px}header{padding:22px 12px}.panel{padding:13px}.terminal{height:205px}.topline{font-size:9px}}
+</style>
+</head>
+<body>
+<canvas id="matrix" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="topline"><span><span class="dot"></span>CYBER CONSOLE / LOCAL</span><span id="clock">00:00:00</span></div>
+  <header>
+    <div class="eyebrow">[ VISUAL LAB // V5.0 ]</div>
+    <h1 class="glitch">WA BUG CYBER V5</h1>
+    <div class="subtitle">NEON GLITCH INTERFACE · TERMINAL SIMULATION<br>LOCAL BROWSER EXPERIENCE</div>
+    <div class="badge">⚠ VISUAL SIMULATION ONLY — NO REAL WHATSAPP ACTIONS</div>
+  </header>
+
+  <div class="grid">
+    <section class="panel">
+      <h2 class="panel-title">CONTROL CENTER <span>01 / COMMANDS</span></h2>
+      <div class="mini-label">Jalankan efek visual simulasi di halaman ini.</div>
+      <div class="controls">
+        <button id="start">▶ START</button>
+        <button id="stop" class="red">■ STOP</button>
+        <button id="reset" class="gray">↻ RESET</button>
+      </div>
+      <div class="progress-head"><span>SIMULATION PROGRESS</span><strong id="percent">0%</strong></div>
+      <div class="track"><div id="bar"></div></div>
+      <div class="switchrow"><span>SCREEN DISTORTION</span><button id="distort" class="red">TRIGGER FX</button></div>
+      <div class="switchrow"><span>OPTIONAL SOUND</span><button id="sound" class="gray">SOUND: OFF</button></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">SYSTEM STATUS <span>02 / LIVE</span></h2>
+      <div class="terminal" id="terminal" role="log" aria-live="polite">
+        <div class="log"><span class="time">[BOOT]</span> <span class="ok">Cyber console initialized.</span></div>
+        <div class="log"><span class="time">[INFO]</span> Mode: browser-only visual simulation.</div>
+        <div class="log"><span class="time">[SAFE]</span> No messages will be sent.</div>
+        <div class="log"><span class="time">[READY]</span> Press START to begin.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">MESSAGE PREVIEW <span>03 / MOCK DATA</span></h2>
+      <div class="mini-label">Pesan contoh fiktif — tidak terhubung ke WhatsApp.</div>
+      <div class="msg"><div class="avatar">CY</div><div class="msgbody"><div class="msghead"><strong>Cyber Demo</strong><small>21:04</small></div><div class="bubble">Halo! Ini hanya contoh pesan untuk tampilan simulasi. ✓✓</div></div></div>
+      <div class="msg"><div class="avatar">V5</div><div class="msgbody"><div class="msghead"><strong>Visual Lab</strong><small>21:05</small></div><div class="bubble">GLITCH EFFECT: <span style="color:var(--green)">ACTIVE</span> — efek terbatas pada halaman ini.</div></div></div>
+      <div class="msg"><div class="avatar">OK</div><div class="msgbody"><div class="msghead"><strong>System Bot</strong><small>21:06</small></div><div class="bubble">Status: aman. Tidak ada aksi eksternal.</div></div></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">VISUAL FX <span>04 / EFFECTS</span></h2>
+      <div class="mini-label">Efek dekoratif berjalan lokal di browser.</div>
+      <div class="switchrow"><span>MATRIX BACKGROUND</span><span class="status">● RUNNING</span></div>
+      <div class="switchrow"><span>SCANLINE OVERLAY</span><span class="status">● RUNNING</span></div>
+      <div class="switchrow"><span>GLITCH TITLE</span><span class="status">● RUNNING</span></div>
+      <div class="switchrow"><span>NETWORK CONNECTION</span><span style="color:var(--red)">● DISABLED</span></div>
+    </section>
+  </div>
+  <div class="footer">WA BUG CYBER V5 · MADE FOR VISUAL FUN<br>SIMULATION ONLY · DOES NOT CONNECT TO OR MODIFY WHATSAPP</div>
+</div>
+
+<div class="error-overlay" id="errorOverlay" role="dialog" aria-modal="true" aria-labelledby="errorTitle">
+  <div class="error-card">
+    <div class="eyebrow">[ LOCAL VISUAL EFFECT ]</div>
+    <h2 id="errorTitle">⚠ GLITCH DETECTED</h2>
+    <p>Ini adalah efek error palsu untuk hiburan. Browser dan WhatsApp Anda tidak mengalami kerusakan.</p>
+    <button id="closeError">DISMISS EFFECT</button>
+  </div>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const terminal = $('terminal'), bar = $('bar'), percent = $('percent');
+  let running = false, progress = 0, timer = null, soundOn = false, audio = null;
+  const messages = [
+    ['INFO','Starting local visual sequence...','log'],
+    ['SCAN','Rendering neon interface layers...','ok'],
+    ['FX','Matrix canvas is active.','ok'],
+    ['MOCK','Loading fictional message previews...','warn'],
+    ['SAFE','External connections: disabled.','ok'],
+    ['FX','Applying harmless glitch animation...','warn'],
+    ['DONE','Visual sequence completed successfully.','ok']
+  ];
+  function addLog(tag, message, cls='ok') {
+    const row = document.createElement('div');
+    row.className = 'log';
+    const now = new Date().toLocaleTimeString('id-ID',{hour12:false});
+    const time = document.createElement('span'); time.className='time'; time.textContent='['+now+'] ';
+    const label = document.createElement('span'); label.className=cls; label.textContent='['+tag+'] '+message;
+    row.append(time,label); terminal.appendChild(row); terminal.scrollTop=terminal.scrollHeight;
+    while(terminal.children.length > 70) terminal.removeChild(terminal.firstChild);
+    if(soundOn) beep();
+  }
+  function beep() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const osc=audio.createOscillator(), gain=audio.createGain();
+      osc.type='square'; osc.frequency.value=660;
+      gain.gain.value=.025; osc.connect(gain); gain.connect(audio.destination);
+      osc.start(); osc.stop(audio.currentTime+.045);
+    } catch(e) {}
+  }
+  function setProgress(value) { progress=Math.max(0,Math.min(100,value));bar.style.width=progress+'%';percent.textContent=progress+'%'; }
+  function stop(message=true) {
+    running=false; if(timer) clearInterval(timer); timer=null;
+    if(message) addLog('STOP','Simulation paused locally.','warn');
+  }
+  $('start').addEventListener('click',()=>{
+    if(running) return;
+    if(progress>=100) setProgress(0);
+    running=true; addLog('START','Visual simulation started.','ok');
+    timer=setInterval(()=>{
+      if(!running) return;
+      setProgress(progress+5);
+      if(progress%15===0) {
+        const item=messages[Math.min(Math.floor(progress/15),messages.length-1)];
+        addLog(item[0],item[1],item[2]);
+      }
+      if(progress>=100){stop(false);addLog('COMPLETE','All visual effects finished.','ok');}
+    },450);
+  });
+  $('stop').addEventListener('click',()=>stop(true));
+  $('reset').addEventListener('click',()=>{
+    stop(false);setProgress(0);terminal.replaceChildren();
+    addLog('RESET','Console reset. Ready for a new simulation.','warn');
+  });
+  $('distort').addEventListener('click',()=>{
+    document.body.classList.remove('distort'); void document.body.offsetWidth;
+    document.body.classList.add('distort');$('errorOverlay').style.display='flex';
+    addLog('FX','Local glitch effect triggered.','warn');
+  });
+  function closeOverlay(){$('errorOverlay').style.display='none';document.body.classList.remove('distort');}
+  $('closeError').addEventListener('click',closeOverlay);
+  $('errorOverlay').addEventListener('click',e=>{if(e.target===$('errorOverlay'))closeOverlay();});
+  $('sound').addEventListener('click',()=>{
+    soundOn=!soundOn;$('sound').textContent='SOUND: '+(soundOn?'ON':'OFF');
+    $('sound').className=soundOn?'':'gray';
+    if(soundOn) beep();
+  });
+  function clock(){ $('clock').textContent=new Date().toLocaleTimeString('id-ID',{hour12:false}); }
+  clock();setInterval(clock,1000);
+
+  // Decorative matrix canvas; no network or external dependencies.
+  const canvas=$('matrix'),ctx=canvas.getContext('2d');
+  let columns=0,drops=[];
+  const chars='01ABCDEF<>/{}[]#$';
+  function resize(){
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=Math.floor(innerWidth*dpr);canvas.height=Math.floor(innerHeight*dpr);
+    canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    columns=Math.ceil(innerWidth/16);drops=Array(columns).fill(1);
+  }
+  function draw(){
+    ctx.fillStyle='rgba(5,8,7,0.12)';ctx.fillRect(0,0,innerWidth,innerHeight);
+    ctx.fillStyle='#39ff88';ctx.font='12px monospace';
+    for(let i=0;i<drops.length;i++){
+      const ch=chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(ch,i*16,drops[i]*16);
+      if(drops[i]*16>innerHeight&&Math.random()>.975)drops[i]=0;
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);resize();draw();
+})();
+</script>
+</body>
+</html>

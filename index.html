@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08090b">
+<title>WA BUG CYBER V5 | Security Panel</title>
+<style>
+:root{--bg:#08090b;--panel:#101216;--panel2:#15181d;--red:#ff304f;--green:#39ff88;--muted:#8b929d;--line:#292e36;--white:#edf2f7}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#1b0a10 0%,#08090b 45%);color:var(--white);font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.018) 4px);opacity:.35}
+.wrap{max-width:1050px;margin:auto;padding:22px 15px 40px}
+header{border:1px solid #48202a;background:linear-gradient(135deg,rgba(255,48,79,.1),rgba(57,255,136,.035));padding:22px;border-radius:16px;box-shadow:0 0 28px #ff304f10}
+.kicker{color:var(--green);font:700 11px/1.4 ui-monospace,monospace;letter-spacing:2px}
+h1{font-size:clamp(25px,5vw,42px);line-height:1.08;margin:9px 0;color:#fff;letter-spacing:-1px;text-shadow:2px 0 #ff304f, -2px 0 #39ff8830}
+.sub{color:var(--muted);margin:10px 0 0}
+.statusline{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:#cbd2dc;font-size:12px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:15px}
+.card{min-width:0;background:linear-gradient(180deg,#12151a,#0e1014);border:1px solid var(--line);border-radius:14px;padding:17px;box-shadow:0 8px 24px #0003}
+.card h2{font-size:16px;margin:0 0 5px;display:flex;align-items:center;gap:8px}
+.num{color:var(--red);font:700 11px ui-monospace,monospace}
+.desc{color:var(--muted);font-size:12px;margin:0 0 13px}
+label{display:block;color:#cbd2dc;font-size:12px;margin:10px 0 6px}
+input,textarea,select{width:100%;background:#090b0e;border:1px solid #303640;border-radius:9px;color:var(--white);padding:11px 12px;font:inherit;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 2px #39ff8818}
+textarea{min-height:85px;resize:vertical}
+button{border:1px solid #39404a;border-radius:9px;padding:10px 13px;color:var(--white);background:#1a1e24;font:700 12px ui-monospace,monospace;cursor:pointer;transition:.15s}
+button:hover{border-color:var(--green);box-shadow:0 0 14px #39ff8814}
+button:active{transform:translateY(1px)}
+.primary{background:#251016;border-color:#8d2034;color:#ff8193}
+.green{background:#0e2419;border-color:#236b43;color:var(--green)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.row button{flex:1}
+.result{margin-top:11px;padding:11px;border:1px dashed #303640;border-radius:9px;background:#090b0e;color:#c7d0db;font-size:12px;overflow-wrap:anywhere;white-space:pre-wrap;min-height:40px}
+.result strong{color:var(--green)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.metric{padding:11px;background:#090b0e;border:1px solid var(--line);border-radius:9px}
+.metric small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.metric b{display:block;margin-top:4px;font:700 18px ui-monospace,monospace;color:var(--green);overflow-wrap:anywhere}
+.terminal{height:220px;overflow:auto;background:#050706;border:1px solid #234a35;border-radius:10px;padding:12px;font:12px/1.65 ui-monospace,SFMono-Regular,monospace;color:#a9f6c7;white-space:pre-wrap;overflow-wrap:anywhere}
+.logline .time{color:#64766b}.logline .tag{color:var(--green)}.logline.warn{color:#ff8295}
+.bar{height:8px;background:#242930;border-radius:99px;overflow:hidden;margin-top:12px}
+.bar span{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--red),var(--green));transition:width .2s}
+footer{text-align:center;color:#68717d;font-size:11px;margin:18px 0}
+.notice{font-size:12px;color:#b6bec8;border-left:3px solid var(--red);padding:9px 11px;background:#ff304f0a;margin-top:13px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wrap{padding:13px 11px 30px}header{padding:18px}.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.metric b{font-size:15px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kicker">CYBER SECURITY // LOCAL MODE</div>
+  <h1>WA BUG <span style="color:var(--red)">CYBER</span> V5</h1>
+  <p class="sub">Security panel • browser-side tools • no external requests</p>
+  <div class="statusline">
+    <span class="pill"><span class="dot"></span> PANEL ONLINE</span>
+    <span class="pill" id="clock">--:--:--</span>
+    <span class="pill">LOCAL TEST ONLY</span>
+  </div>
+</header>
+
+<div class="grid">
+<section class="card">
+  <h2><span class="num">01</span> Dashboard</h2>
+  <p class="desc">Ringkasan sesi panel saat ini.</p>
+  <div class="metrics">
+    <div class="metric"><small>Uptime</small><b id="uptime">0s</b></div>
+    <div class="metric"><small>Log events</small><b id="eventCount">0</b></div>
+    <div class="metric"><small>Test status</small><b id="testState">IDLE</b></div>
+  </div>
+  <div class="notice">Semua fitur berjalan lokal di halaman ini. Tidak ada pesan yang dikirim ke WhatsApp.</div>
+</section>
+
+<section class="card">
+  <h2><span class="num">02</span> Number Validator</h2>
+  <p class="desc">Memeriksa format nomor Indonesia, bukan identitas atau status akun.</p>
+  <label for="phone">Nomor telepon</label>
+  <input id="phone" inputmode="tel" autocomplete="tel" placeholder="Contoh: 081234567890">
+  <div class="row">
+    <button class="green" id="validateBtn">VALIDATE</button>
+    <button id="clearPhone">CLEAR</button>
+  </div>
+  <div class="result" id="phoneResult">Hasil validasi akan muncul di sini.</div>
+</section>
+
+<section class="card">
+  <h2><span class="num">03</span> Text Glitch Generator</h2>
+  <p class="desc">Membuat teks bergaya glitch untuk efek visual atau desain.</p>
+  <label for="glitchInput">Teks sumber</label>
+  <textarea id="glitchInput" maxlength="300" placeholder="Ketik teks di sini...">CYBER SECURITY</textarea>
+  <label for="glitchLevel">Intensitas efek</label>
+  <select id="glitchLevel"><option value="1">Rendah</option><option value="2" selected>Sedang</option><option value="3">Tinggi</option></select>
+  <div class="row">
+    <button class="primary" id="generateBtn">GENERATE</button>
+    <button id="copyGlitch">COPY RESULT</button>
+  </div>
+  <div class="result" id="glitchResult">Hasil teks glitch muncul di sini.</div>
+</section>
+
+<section class="card">
+  <h2><span class="num">04</span> Local Stress Test</h2>
+  <p class="desc">Mengukur animasi lokal selama maksimal 10 detik. Tidak menguji aplikasi atau perangkat lain.</p>
+  <div class="metrics">
+    <div class="metric"><small>Elapsed</small><b id="elapsed">0.0s</b></div>
+    <div class="metric"><small>Frames</small><b id="frames">0</b></div>
+    <div class="metric"><small>FPS approx.</small><b id="fps">—</b></div>
+  </div>
+  <div class="bar"><span id="progress"></span></div>
+  <div class="row">
+    <button class="green" id="startTest">START TEST</button>
+    <button class="primary" id="stopTest" disabled>STOP TEST</button>
+  </div>
+  <div class="result" id="stressResult">Status: siap. Durasi dibatasi 10 detik.</div>
+</section>
+
+<section class="card">
+  <h2><span class="num">05</span> Device Checker</h2>
+  <p class="desc">Informasi yang tersedia dari browser. Sebagian data mungkin dibatasi oleh sistem operasi.</p>
+  <div class="result" id="deviceInfo">Memuat informasi browser…</div>
+  <div class="row"><button id="refreshDevice">REFRESH INFO</button><button id="copyDevice">COPY INFO</button></div>
+</section>
+
+<section class="card">
+  <h2><span class="num">06</span> Live Terminal</h2>
+  <p class="desc">Log aktivitas panel ini secara langsung.</p>
+  <div class="terminal" id="terminal" aria-live="polite"></div>
+  <div class="row">
+    <button id="copyLogs">COPY LOGS</button>
+    <button id="clearLogs">CLEAR LOGS</button>
+    <button class="primary" id="resetAll">RESET PANEL</button>
+  </div>
+</section>
+</div>
+<footer>WA BUG CYBER V5 • LOCAL BROWSER DEMO • Gunakan secara bertanggung jawab</footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const startedAt = Date.now();
+  let eventCount = 0, testTimer = null, rafId = null, testStarted = 0;
+  let frameCount = 0, lastFrameTime = 0, running = false;
+  const logs = [];
+
+  function timeStamp() {
+    return new Date().toLocaleTimeString('id-ID', {hour12:false});
+  }
+  function log(message, warning=false) {
+    eventCount++;
+    $("eventCount").textContent = eventCount;
+    const entry = `[${timeStamp()}] ${message}`;
+    logs.push(entry);
+    if (logs.length > 120) logs.shift();
+    const line = document.createElement("div");
+    line.className = "logline" + (warning ? " warn" : "");
+    const t = document.createElement("span"); t.className = "time"; t.textContent = `[${timeStamp()}] `;
+    const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = warning ? "[NOTICE] " : "[SYSTEM] ";
+    const msg = document.createElement("span"); msg.textContent = message;
+    line.append(t, tag, msg);
+    $("terminal").appendChild(line);
+    $("terminal").scrollTop = $("terminal").scrollHeight;
+  }
+  function updateClock() {
+    $("clock").textContent = timeStamp();
+    const seconds = Math.floor((Date.now() - startedAt) / 1000);
+    $("uptime").textContent = seconds < 60 ? `${seconds}s` : `${Math.floor(seconds/60)}m ${seconds%60}s`;
+  }
+  function validatePhone() {
+    const raw = $("phone").value.trim();
+    const digits = raw.replace(/[\s().-]/g, "");
+    const normalized = digits.startsWith("+") ? digits.slice(1) : digits;
+    let intl = normalized;
+    if (intl.startsWith("0")) intl = "62" + intl.slice(1);
+    const valid = /^62[0-9]{8,13}$/.test(intl);
+    $("phoneResult").textContent = valid
+      ? `Format terlihat valid.\nFormat internasional: +${intl}\nCatatan: ini hanya memeriksa pola angka, bukan memastikan nomor aktif atau terdaftar di WhatsApp.`
+      : "Format belum sesuai pola nomor Indonesia. Coba 08xxxxxxxxxx atau +628xxxxxxxxxx.";
+    $("phoneResult").style.color = valid ? "var(--green)" : "var(--red)";
+    log(valid ? `Format nomor lolos pemeriksaan pola (+${intl}).` : "Format nomor tidak sesuai pola.", !valid);
+  }
+  function makeGlitch() {
+    const source = $("glitchInput").value;
+    const level = Number($("glitchLevel").value);
+    const marks = ["̷","̸","̶","͟","̲","͎","̽","͛"];
+    const out = Array.from(source).map(ch => {
+      if (ch === " " || Math.random() > 0.22 * level) return ch;
+      let decorated = ch;
+      const count = level === 1 ? 1 : level === 2 ? 1 + (Math.random() > .5 ? 1 : 0) : 1 + Math.floor(Math.random()*3);
+      for (let i=0; i<count; i++) decorated += marks[Math.floor(Math.random()*marks.length)];
+      return decorated;
+    }).join("");
+    $("glitchResult").textContent = out || "(masukkan teks terlebih dahulu)";
+    log("Teks glitch dibuat secara lokal.");
+  }
+  async function copyText(text, label) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const area = document.createElement("textarea");
+        area.value = text; area.style.position = "fixed"; area.style.opacity = "0";
+        document.body.appendChild(area); area.select();
+        const ok = document.execCommand("copy"); area.remove();
+        if (!ok) throw new Error("copy unavailable");
+      }
+      log(`${label} disalin ke clipboard.`);
+    } catch (_) {
+      log(`Tidak dapat menyalin ${label}. Pilih dan salin teks secara manual.`, true);
+    }
+  }
+  function deviceInfo() {
+    const ua = navigator.userAgent || "Tidak tersedia";
+    const platform = navigator.userAgentData?.platform || navigator.platform || "Tidak tersedia";
+    const info = [
+      `Platform: ${platform}`,
+      `Browser/UA: ${ua}`,
+      `Bahasa: ${navigator.language || "Tidak tersedia"}`,
+      `Ukuran layar: ${screen.width} × ${screen.height}`,
+      `Viewport: ${window.innerWidth} × ${window.innerHeight}`,
+      `Pixel ratio: ${window.devicePixelRatio || 1}`,
+      `Online menurut browser: ${navigator.onLine ? "Ya" : "Tidak"}`,
+      `Cookies: ${navigator.cookieEnabled ? "Aktif" : "Nonaktif"}`,
+      `Hardware concurrency: ${navigator.hardwareConcurrency || "Tidak tersedia"}`,
+      `Waktu pemeriksaan: ${new Date().toLocaleString("id-ID")}`
+    ].join("\n");
+    $("deviceInfo").textContent = info;
+    return info;
+  }
+  function stopTest(reason="Dihentikan oleh pengguna.") {
+    if (!running) return;
+    running = false;
+    clearInterval(testTimer); testTimer = null;
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    rafId = null;
+    $("startTest").disabled = false;
+    $("stopTest").disabled = true;
+    $("testState").textContent = "IDLE";
+    $("stressResult").textContent = `${reason}\nTotal durasi: ${((Date.now()-testStarted)/1000).toFixed(1)} detik.`;
+    $("progress").style.width = "0%";
+    log(reason, true);
+  }
+  function startTest() {
+    if (running) return;
+    running = true;
+    testStarted = Date.now(); frameCount = 0; lastFrameTime = 0;
+    $("startTest").disabled = true; $("stopTest").disabled = false;
+    $("testState").textContent = "RUNNING";
+    $("stressResult").textContent = "Pengujian animasi lokal sedang berjalan…";
+    log("Stress test lokal dimulai (batas maksimal 10 detik).");
+    function frame(now) {
+      if (!running) return;
+      frameCount++;
+      if (now - lastFrameTime >= 500) {
+        lastFrameTime = now;
+        const elapsed = (Date.now() - testStarted) / 1000;
+        $("elapsed").textContent = `${elapsed.toFixed(1)}s`;
+        $("frames").textContent = frameCount;
+        $("fps").textContent = elapsed > 0 ? Math.round(frameCount / elapsed) : "—";
+        $("progress").style.width = `${Math.min(100, elapsed/10*100)}%`;
+        $("stressResult").textContent = `Berjalan lokal • ${elapsed.toFixed(1)} dari 10 detik.\nFPS adalah perkiraan dan dapat berbeda sesuai browser/perangkat.`;
+        if (elapsed >= 10) {
+          stopTest("Batas 10 detik tercapai. Pengujian selesai.");
+          $("elapsed").textContent = "10.0s";
+          $("progress").style.width = "100%";
+          return;
+        }
+      }
+      rafId = requestAnimationFrame(frame);
+    }
+    rafId = requestAnimationFrame(frame);
+    testTimer = setTimeout(() => { if (running) stopTest("Batas waktu otomatis tercapai."); }, 10000);
+  }
+  function resetPanel() {
+    if (running) stopTest("Pengujian dihentikan saat reset.");
+    $("phone").value = "";
+    $("phoneResult").textContent = "Hasil validasi akan muncul di sini.";
+    $("phoneResult").style.color = "";
+    $("glitchInput").value = "CYBER SECURITY";
+    $("glitchLevel").value = "2";
+    $("glitchResult").textContent = "Hasil teks glitch muncul di sini.";
+    $("elapsed").textContent = "0.0s"; $("frames").textContent = "0"; $("fps").textContent = "—";
+    $("progress").style.width = "0%"; $("stressResult").textContent = "Status: siap. Durasi dibatasi 10 detik.";
+    $("terminal").textContent = ""; logs.length = 0; eventCount = 0; $("eventCount").textContent = "0";
+    $("testState").textContent = "IDLE";
+    deviceInfo();
+    log("Panel direset. Semua fitur siap digunakan.");
+  }
+
+  $("validateBtn").addEventListener("click", validatePhone);
+  $("clearPhone").addEventListener("click", () => { $("phone").value=""; $("phoneResult").textContent="Kolom dibersihkan."; log("Kolom nomor dibersihkan."); });
+  $("generateBtn").addEventListener("click", makeGlitch);
+  $("copyGlitch").addEventListener("click", () => copyText($("glitchResult").textContent, "hasil glitch"));
+  $("startTest").addEventListener("click", startTest);
+  $("stopTest").addEventListener("click", () => stopTest());
+  $("refreshDevice").addEventListener("click", () => { deviceInfo(); log("Informasi browser diperbarui."); });
+  $("copyDevice").addEventListener("click", () => copyText($("deviceInfo").textContent, "informasi perangkat"));
+  $("copyLogs").addEventListener("click", () => copyText(logs.join("\n") || "Belum ada log.", "log terminal"));
+  $("clearLogs").addEventListener("click", () => { $("terminal").textContent=""; logs.length=0; log("Terminal dibersihkan."); });
+  $("resetAll").addEventListener("click", resetPanel);
+  $("phone").addEventListener("keydown", e => { if(e.key==="Enter") validatePhone(); });
+  deviceInfo();
+  log("Panel siap. Mode lokal aktif.");
+  log("Tidak ada koneksi atau permintaan ke WhatsApp.");
+  updateClock(); setInterval(updateClock, 1000);
+})();
+</script>
+</body>
+</html>
